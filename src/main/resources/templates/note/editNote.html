@@ -2,7 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Новая заметка</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование заметки</title>
 
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
 </head>
@@ -10,14 +11,15 @@
 
 <header>
     <a th:href="@{/api/notes}" class="btn btn-primary">Все заметки</a>
+    <a th:href="@{/api/notes/{noteId}(noteId=${note.id})}" class="btn btn-secondary">Текущая заметка</a>
 </header>
 
 <div align="center">
-    <h2>Новая заметка</h2>
+    <h2>Редактирование заметки</h2>
     <br>
 
-    <form th:method="POST"
-          th:action="@{/api/notes}"
+    <form th:method="PATCH"
+          th:action="@{/api/notes/{noteId}(noteId=${note.id})}"
           th:object="${note}">
         <div class="form-group">
             <label class="fs-5" for="title">Заголовок:</label><br>
@@ -33,7 +35,7 @@
             <div style="color:red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
         </div>
 
-        <input type="submit" class="btn btn-success" value="Создать заметку"/>
+        <input type="submit" class="btn btn-success" value="Сохранить изменения"/>
     </form>
 </div>
 

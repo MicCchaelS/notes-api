@@ -50,7 +50,7 @@ public class NoteController {
     @GetMapping("/notes/{id}/edit")
     public String showEditNotePage(@PathVariable("id") int id, Model model) {
         model.addAttribute("note", noteService.findNoteById(id));
-        return "note/editForm";
+        return "note/editNote";
     }
 
     @PatchMapping("/notes/{id}")
