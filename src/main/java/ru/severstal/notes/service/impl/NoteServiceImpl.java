@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.severstal.notes.dto.NoteDTO;
 import ru.severstal.notes.dto.NotesDTO;
+import ru.severstal.notes.exception.ResourceNotFoundException;
 import ru.severstal.notes.model.Note;
 import ru.severstal.notes.repository.NoteRepository;
 import ru.severstal.notes.service.NoteService;
@@ -34,7 +35,7 @@ public class NoteServiceImpl implements NoteService {
     public NoteDTO findNoteById(int id) {
         return noteRepository.findById(id)
                 .map(note -> modelMapperUtil.map(note, NoteDTO.class))
-                .orElseThrow(); //todo Ошибка: Заметка не найдена
+                .orElseThrow(() -> new ResourceNotFoundException("Заметка не найдена"));
     }
 
     @Transactional
@@ -63,7 +64,7 @@ public class NoteServiceImpl implements NoteService {
                 .ifPresentOrElse(
                         noteRepository::delete,
                         () -> {
-                            throw new RuntimeException(); //todo Ошибка: Заметка не найдена
+                            throw new ResourceNotFoundException("Заметка не найдена");
                         }
                 );
     }
