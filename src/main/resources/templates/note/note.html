@@ -23,8 +23,15 @@
     </div>
 
     <form th:method="GET"
-          th:action="@{/api/notes/{noteId}/edit(noteId=${note.id})}">
+          th:action="@{/api/notes/{noteId}/edit(noteId=${note.id})}"
+          style="display: inline-block">
         <input type="submit" class="btn btn-info" value="Редактировать"/>
+    </form>
+
+    <form th:method="DELETE"
+          th:action="@{/api/notes/{noteId}(noteId=${note.id})}"
+          style="display: inline-block">
+        <input type="submit" class="btn btn-danger" value="Удалить"/>
     </form>
 </div>
 

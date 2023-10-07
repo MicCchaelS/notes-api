@@ -1,8 +1,10 @@
 package ru.severstal.notes.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.severstal.notes.dto.NoteDTO;
 import ru.severstal.notes.service.NoteService;
@@ -43,8 +45,11 @@ public class NoteController {
     }
 
     @PostMapping("/notes")
-    public String createNewNote(@ModelAttribute("note") NoteDTO noteDTO) {
-        return "redirect:/api/notes/" + noteService.saveNote(noteDTO).getId();
+    public String createNewNote(@ModelAttribute("note") @Valid NoteDTO noteDTO,
+                                BindingResult bindingResult) {
+        return bindingResult.hasErrors()
+                ? "note/newNote"
+                : "redirect:/api/notes/" + noteService.saveNote(noteDTO).getId();
     }
 
     @GetMapping("/notes/{id}/edit")
@@ -54,7 +59,12 @@ public class NoteController {
     }
 
     @PatchMapping("/notes/{id}")
-    public String editNote(@ModelAttribute("note") NoteDTO noteDTO) {
+    public String editNote(@ModelAttribute("note") @Valid NoteDTO noteDTO,
+                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "note/editNote";
+        }
+
         noteService.updateNote(noteDTO);
         return "redirect:/api/notes/{id}";
     }
