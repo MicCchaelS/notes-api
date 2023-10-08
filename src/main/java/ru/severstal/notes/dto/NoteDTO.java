@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -17,4 +18,8 @@ public class NoteDTO {
 
     @Size(max = 2500, message = "Описание не должно содержать больше 2500 символов")
     private String description;
+
+    private MultipartFile image;
+
+    private String imagePath;
 }

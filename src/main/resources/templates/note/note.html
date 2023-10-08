@@ -21,6 +21,11 @@
                   th:text="${note.description}" id="description"></textarea>
     </div>
 
+    <div th:if="${note.imagePath != null && !note.imagePath.isBlank()}">
+        <a th:href="${note.imagePath}" class="btn btn-link">Просмотреть изображение</a>
+        <br><br>
+    </div>
+
     <form th:method="GET"
           th:action="@{/api/notes/{noteId}/edit(noteId=${note.id})}"
           style="display: inline-block">

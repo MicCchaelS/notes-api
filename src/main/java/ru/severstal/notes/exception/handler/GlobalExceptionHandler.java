@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.severstal.notes.exception.ImageDeletionException;
 import ru.severstal.notes.exception.ResourceNotFoundException;
 
 @Slf4j
@@ -17,6 +18,13 @@ public class GlobalExceptionHandler {
     public String handleException(ResourceNotFoundException e, Model model) {
         log.error(e.getMessage(), e);
         model.addAttribute("error", e.getMessage());
-        return "error/resourceNotFound";
+        return "error/error";
+    }
+
+    @ExceptionHandler(ImageDeletionException.class)
+    public String handleException(ImageDeletionException e, Model model) {
+        log.error(e.getMessage(), e.getIoException());
+        model.addAttribute("error", e.getMessage());
+        return "error/error";
     }
 }

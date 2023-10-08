@@ -8,6 +8,7 @@ import ru.severstal.notes.dto.NotesDTO;
 import ru.severstal.notes.exception.ResourceNotFoundException;
 import ru.severstal.notes.model.Note;
 import ru.severstal.notes.repository.NoteRepository;
+import ru.severstal.notes.service.ImageService;
 import ru.severstal.notes.service.NoteService;
 import ru.severstal.notes.util.ModelMapperUtil;
 
@@ -23,6 +24,8 @@ public class NoteServiceImpl implements NoteService {
 
     private final ModelMapperUtil modelMapperUtil;
 
+    private final ImageService imageService;
+
     @Override
     public List<NotesDTO> findAllNotes() {
         return noteRepository.findAll()
@@ -35,14 +38,17 @@ public class NoteServiceImpl implements NoteService {
     public NoteDTO findNoteById(int id) {
         return noteRepository.findById(id)
                 .map(note -> modelMapperUtil.map(note, NoteDTO.class))
-                .orElseThrow(() -> new ResourceNotFoundException("Заметка не найдена"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ошибка: Заметка не найдена"));
     }
 
     @Transactional
     @Override
     public NoteDTO saveNote(NoteDTO noteDTO) {
         return Optional.of(noteDTO)
-                .map(dto -> modelMapperUtil.map(dto, Note.class))
+                .map(dto -> {
+                    uploadImage(dto);
+                    return modelMapperUtil.map(dto, Note.class);
+                })
                 .map(noteRepository::save)
                 .map(note -> modelMapperUtil.map(note, NoteDTO.class))
                 .orElseThrow();
@@ -52,7 +58,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void updateNote(NoteDTO noteDTO) {
         Optional.of(noteDTO)
-                .map(dto -> modelMapperUtil.map(dto, Note.class))
+                .map(dto -> {
+                    imageService.deleteImage(dto.getImagePath());
+                    uploadImage(dto);
+                    return modelMapperUtil.map(dto, Note.class);
+                })
                 .map(noteRepository::save)
                 .orElseThrow();
     }
@@ -60,12 +70,17 @@ public class NoteServiceImpl implements NoteService {
     @Transactional
     @Override
     public void deleteNote(int id) {
-        noteRepository.findById(id)
-                .ifPresentOrElse(
-                        noteRepository::delete,
-                        () -> {
-                            throw new ResourceNotFoundException("Заметка не найдена");
-                        }
-                );
+        var note = noteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ошибка: Заметка не найдена"));
+
+        imageService.deleteImage(note.getImagePath());
+        noteRepository.delete(note);
+    }
+
+    private void uploadImage(NoteDTO noteDTO) {
+        if (noteDTO.getImage() != null && !noteDTO.getImage().isEmpty()) {
+            var imagePath = imageService.saveImage(noteDTO.getImage());
+            noteDTO.setImagePath(imagePath);
+        }
     }
 }

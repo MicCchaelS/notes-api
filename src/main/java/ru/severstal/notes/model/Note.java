@@ -18,4 +18,7 @@ public class Note {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "image_path")
+    private String imagePath;
 }
